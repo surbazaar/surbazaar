@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { PlayerProvider } from "@/components/player";
+import { AccountMenu } from "@/components/account-menu";
 import { getSession } from "@/lib/auth";
 import { signOut } from "@/app/actions/auth";
 
@@ -14,9 +15,14 @@ export const metadata: Metadata = {
 async function Header() {
   const { user, profile, supabase } = await getSession();
   let cartCount = 0;
+  let producerStatus: string | null = null;
   if (user) {
-    const { count } = await supabase.from("cart_items").select("*", { count: "exact", head: true });
+    const [{ count }, { data: producer }] = await Promise.all([
+      supabase.from("cart_items").select("*", { count: "exact", head: true }),
+      supabase.from("producer_profiles").select("status").eq("user_id", user.id).maybeSingle(),
+    ]);
     cartCount = count ?? 0;
+    producerStatus = producer?.status ?? null;
   }
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-ink/90 backdrop-blur">
@@ -33,15 +39,16 @@ async function Header() {
         <div className="ml-auto flex items-center gap-3 text-sm">
           {user ? (
             <>
-              {profile?.role === "admin" && <Link href="/admin" className="btn-ghost">Admin</Link>}
-              {profile?.role !== "buyer" && <Link href="/studio" className="btn-ghost">Studio</Link>}
-              <Link href="/orders" className="hidden text-muted hover:text-sand sm:block">My licences</Link>
               <Link href="/cart" className="btn-ghost">
                 Cart{cartCount > 0 && <span className="rounded-full bg-saffron px-1.5 text-xs text-ink">{cartCount}</span>}
               </Link>
-              <form action={signOut}>
-                <button className="text-muted hover:text-sand">Sign out</button>
-              </form>
+              <AccountMenu
+                name={profile?.display_name ?? ""}
+                email={profile?.email ?? user.email ?? null}
+                role={profile?.role ?? "buyer"}
+                producerStatus={producerStatus}
+                signOut={signOut}
+              />
             </>
           ) : (
             <>
@@ -56,7 +63,6 @@ async function Header() {
         <Link href="/licences">Licences</Link>
         <Link href="/verify">Verify</Link>
         <Link href="/sell">Sell</Link>
-        {user && <Link href="/orders">My licences</Link>}
       </nav>
     </header>
   );
