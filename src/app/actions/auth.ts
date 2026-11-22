@@ -43,7 +43,13 @@ export async function signUp(_: ActionResult, fd: FormData): Promise<ActionResul
       emailRedirectTo: `${await origin()}/auth/callback?next=${encodeURIComponent(next)}`,
     },
   });
-  if (error) return { error: error.message };
+  if (error) {
+    if (/rate limit/i.test(error.message)) {
+      return { error: "Too many sign-ups right now — we couldn't send the confirmation email. Please try again in an hour." };
+    }
+    if (/already registered/i.test(error.message)) return { error: "This email already has an account. Please sign in." };
+    return { error: error.message };
+  }
   if (data.session) redirect(next);
   redirect(`/signup/check-email?email=${encodeURIComponent(String(fd.get("email") ?? "").trim())}`);
 }
@@ -59,7 +65,7 @@ export async function sendReset(_: ActionResult, fd: FormData): Promise<ActionRe
   const { error } = await supabase.auth.resetPasswordForEmail(String(fd.get("email") ?? "").trim(), {
     redirectTo: `${await origin()}/auth/callback?next=/account`,
   });
-  if (error) return { error: error.message };
+  if (error) return { error: /rate limit/i.test(error.message) ? "Too many emails sent. Please try again in an hour." : error.message };
   return { ok: "If that email has an account, a reset link is on its way." };
 }
 
