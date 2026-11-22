@@ -33,7 +33,8 @@ export async function signUp(_: ActionResult, fd: FormData): Promise<ActionResul
   const password = String(fd.get("password") ?? "");
   if (name.length < 2) return { error: "Please enter your name." };
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
-  const next = safeNext(fd.get("next"));
+  const requested = safeNext(fd.get("next"));
+  const next = requested === "/" ? "/welcome" : requested;
   const { data, error } = await supabase.auth.signUp({
     email: String(fd.get("email") ?? "").trim(),
     password,
@@ -44,7 +45,7 @@ export async function signUp(_: ActionResult, fd: FormData): Promise<ActionResul
   });
   if (error) return { error: error.message };
   if (data.session) redirect(next);
-  return { ok: "Account created. Check your email for a confirmation link, then sign in." };
+  redirect(`/signup/check-email?email=${encodeURIComponent(String(fd.get("email") ?? "").trim())}`);
 }
 
 export async function signOut() {
