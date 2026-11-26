@@ -66,7 +66,7 @@ export default async function AccountPage() {
         <h2 className="h-display text-2xl">Selling on SurBazaar</h2>
         {!producer ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-muted">Make beats? Apply with 3 samples and keep 80% of every sale.</p>
+            <p className="text-sm text-muted">Make beats? Apply with a sample beat and keep 80% of every sale.</p>
             <Link href="/sell" className="btn-primary">Become a producer</Link>
           </div>
         ) : producer.status === "approved" ? (

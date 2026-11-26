@@ -57,9 +57,9 @@ export default async function SellPage() {
             <textarea id="bio" name="bio" rows={3} maxLength={1000} defaultValue={p?.bio ?? ""} className="input" />
           </div>
           <div className="space-y-2">
-            <span className="label">3 sample beats for review (links)</span>
+            <span className="label">Sample beats for review (1 link required, up to 3)</span>
             {[0, 1, 2].map((i) => (
-              <input key={i} name={`sample${i + 1}`} type="url" required defaultValue={p?.sample_links?.[i]} placeholder="https://soundcloud.com/…" className="input" />
+              <input key={i} name={`sample${i + 1}`} type="url" required={i === 0} defaultValue={p?.sample_links?.[i]} placeholder={i === 0 ? "https://soundcloud.com/…" : "Another link (optional)"} className="input" />
             ))}
           </div>
 

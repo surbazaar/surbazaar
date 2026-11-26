@@ -34,7 +34,7 @@ export default async function WelcomePage() {
               ? producer.status === "approved"
                 ? "You're approved. Upload beats and track your sales."
                 : `Your producer application is ${producer.status}. You can view or update it.`
-              : "Apply with 3 sample beats. Keep 80% of every sale, paid to JazzCash, Easypaisa or bank."}
+              : "Apply with a sample beat. Keep 80% of every sale, paid to JazzCash, Easypaisa or bank."}
           </p>
           <span className="btn-ghost mt-5">
             {producer?.status === "approved" ? "Open studio →" : producer ? "View application →" : "Apply as a producer →"}

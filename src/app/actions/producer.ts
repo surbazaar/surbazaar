@@ -20,7 +20,7 @@ export async function applyProducer(_: ActionResult, fd: FormData): Promise<Acti
   const { supabase, user } = await me();
   if (!fd.get("agree")) return { error: "You must accept the producer agreement." };
   const samples = [str(fd, "sample1"), str(fd, "sample2"), str(fd, "sample3")].filter(Boolean);
-  if (samples.length < 3) return { error: "Please share links to 3 sample beats (SoundCloud, YouTube, Drive…)." };
+  if (samples.length < 1) return { error: "Please share at least one link to a sample beat (SoundCloud, YouTube, Drive…)." };
   if (samples.some((s) => !/^https?:\/\//i.test(s))) return { error: "Sample links must start with http:// or https://" };
   const stage = str(fd, "stage_name");
   const slug = slugify(str(fd, "slug") || stage);
